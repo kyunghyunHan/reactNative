@@ -5,111 +5,60 @@
  * Generated with the TypeScript template
  * https://github.com/react-native-community/react-native-template-typescript
  *
- * @format
+ * 
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import React,{Component, useMemo} from "react";
+import type{FC} from 'react'
+import { SafeAreaView,StyleSheet,FlatList,View,ScrollView,Dimensions ,Text} from "react-native";
+import { Colors } from "react-native-paper";
+import PersonUsingValueState from './src/screens/PersonUsingValueState'
+import PersonUsingObjectState from './src/screens/PersonUsingObjectState'
+import PersonUsingPassingState from './src/screens/PersonUsingPassingState'
+import * as D from './src/data'
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
 
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+const {width} =Dimensions.get('window')
+
+type PersonInformation ={
+  title:string
+  Component:FC<any>
+}
+
+const PersonInfomations :PersonInformation[]=[
+  {title:'PersonUsingValueState',Component:PersonUsingValueState},
+  {title:'PersonUsingObjectState',Component:PersonUsingObjectState},
+  {title:'PersonUsingPassingState',Component:PersonUsingPassingState}
+
+
+]
+const numberOfComponents=PersonInfomations.length
+export default function App(){
+  const people=useMemo(()=>D.makeArray(10).map(D.createRandomPerson),[])
+  const children=useMemo(()=>
+  PersonInfomations.map(({title,Component}:PersonInformation)=>(
+    <View style={{flex:1}} key={title}>
+      <Text style={[styles.text]}>{title}</Text>
+      <FlatList data={people}
+      renderItem={({item})=><Component person={item}/>}
+      keyExtractor={(item,index)=>item.id}
+      ItemSeparatorComponent={()=><View style={styles.itemSeparator}/>}/>
     </View>
-  );
-};
-
-const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+  ))
+  ,[])
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
+    <SafeAreaView style={styles.flex}>
+      <ScrollView horizontal
+      contentContainerStyle={styles.horizontalScrollView}>
+        {children}
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
+  flex:{flex:1},
+  itemSeparator:{borderWidth:1,borderColor:Colors.grey500},
+  horizontalScrollView:{width:width * numberOfComponents},
+  text:{fontSize:24,textAlign:'center'}
+})
