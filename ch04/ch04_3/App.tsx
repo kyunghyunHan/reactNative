@@ -8,7 +8,7 @@
  * 
  */
 
-import React,{Component, useMemo} from "react";
+import React,{useState, useMemo} from "react";
 import type{FC} from 'react'
 import { SafeAreaView,StyleSheet,FlatList,View,ScrollView,Dimensions ,Text} from "react-native";
 import { Colors } from "react-native-paper";
@@ -16,6 +16,7 @@ import PersonUsingValueState from './src/screens/PersonUsingValueState'
 import PersonUsingObjectState from './src/screens/PersonUsingObjectState'
 import PersonUsingPassingState from './src/screens/PersonUsingPassingState'
 import * as D from './src/data'
+import TopBar from "./src/screens/Tobar";
 
 
 const {width} =Dimensions.get('window')
@@ -34,7 +35,7 @@ const PersonInfomations :PersonInformation[]=[
 ]
 const numberOfComponents=PersonInfomations.length
 export default function App(){
-  const people=useMemo(()=>D.makeArray(10).map(D.createRandomPerson),[])
+  const [people,setPeople]=useState<D.IPerson[]>([])
   const children=useMemo(()=>
   PersonInfomations.map(({title,Component}:PersonInformation)=>(
     <View style={{flex:1}} key={title}>
@@ -45,9 +46,10 @@ export default function App(){
       ItemSeparatorComponent={()=><View style={styles.itemSeparator}/>}/>
     </View>
   ))
-  ,[])
+  ,[people.length])
   return (
     <SafeAreaView style={styles.flex}>
+      <TopBar setPeople={setPeople}/>
       <ScrollView horizontal
       contentContainerStyle={styles.horizontalScrollView}>
         {children}

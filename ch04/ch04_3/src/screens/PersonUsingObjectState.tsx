@@ -1,4 +1,4 @@
-import React , {useCallback} from "react";
+import React , {useCallback,useState} from "react";
 import type {FC} from 'react'
 import {View,Text,Image,Alert} from 'react-native'
 import {Colors} from 'react-native-paper'
@@ -17,11 +17,36 @@ export type PersonProps ={
 }
 
 
-const Person:FC<PersonProps>=({person})=>{
+const PersonUsingObjectState:FC<PersonProps>=({person:initialPerson})=>{
     const avatarpressed =useCallback(()=>Alert.alert('avatar pressed.'),[])
 const deletepressed=useCallback(()=>Alert.alert('delete pressed.'),[])
-const countIconPressed=useCallback((name:string)=>()=>Alert.alert(`${name} pressed.`),[])
 
+const [person,setPerson]=useState<D.IPerson>({
+    ...initialPerson,
+    counts:{comment:0,retweet:0,heart:0}
+})
+const commentIconPressed=useCallback(()=>setPerson(person=>({
+    ...person,
+    counts:{
+        ...person.counts,
+        comment:person.counts.comment+1
+    }
+})),[])
+
+const retweetIconPressed = useCallback(()=>setPerson(person=>({
+    ...person,
+    counts:{
+        ...person.counts,
+        retweet:person.counts.retweet+1
+    }
+})),[])
+const heartIconPressed=useCallback(()=>setPerson(person=>({
+    ...person,
+    counts:{
+        ...person.counts,
+        heart:person.counts.heart+1
+    }
+})),[])
 
 return(
         <View style={[styles.view]}>
@@ -45,15 +70,15 @@ return(
                 </Text>
                 <Image style={[styles.image]} source ={{uri:person.image}}/>
                 <View style={[styles.countView]}>
-                    <IconText viewStyle={[styles.touchableIcon]} onPress={countIconPressed('comment')}
+                    <IconText viewStyle={[styles.touchableIcon]} onPress={commentIconPressed}
                     name="comment" size={24} color={Colors.blue500}
                     textStyle={[styles.iconText]} text={person.counts.comment}/>
                     <IconText viewStyle={[styles.touchableIcon]}
-                    onPress={countIconPressed('retweet')}
+                    onPress={retweetIconPressed}
                     name="twitter-retweet" size={24} color ={Colors.purple500}
                     textStyle ={[styles.iconText]} text={person.counts.retweet}/>
                     <IconText viewStyle={[styles.touchableIcon]}
-                    onPress ={countIconPressed('heart')}
+                    onPress ={heartIconPressed}
                     name="heart" size={24} color={Colors.red500}
                     textStyle={[styles.iconText]}text={person.counts.heart}/>
                 </View>
@@ -73,4 +98,4 @@ return(
 
 
 
-export default Person
+export default PersonUsingObjectState
