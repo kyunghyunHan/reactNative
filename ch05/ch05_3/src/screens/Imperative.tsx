@@ -1,10 +1,11 @@
 import React,{useRef,useCallback,useState} from 'react'
-import { StyleSheet,Switch,TextInput as RNTextInpit,Keyboard} from 'react-native'
-import { TextInput,Text,View} from '../theme/paper'
-
+import { StyleSheet,Switch} from 'react-native'
 import { useTheme } from 'react-native-paper'
 import { useToggleTheme,AutoFocusProvider,useAutoFocus } from '../contexts'
+import { Text,View } from '../theme/paper'
 import * as D from '../data'
+import ImperativeTextInput  from './ImperativeTextInput'
+import type {TextInputMethods} from './ImperativeTextInput'
 
 
 
@@ -12,17 +13,22 @@ export default function Theme(){
   const [person,setPerson] =useState<D.IPerson>(D.createRandomPerson())
   const {dark} =useTheme()
   const {toggleTheme}=useToggleTheme()
+  const autoFocus=useAutoFocus()
 
-  const textInputRef=useRef<RNTextInpit | null>(null)
-  const setFocus=useCallback(()=>
-  textInputRef.current?.focus(),[textInputRef.current])
-  const autoFocus = useAutoFocus()
+  const methodsRef=useRef<TextInputMethods | null>(null)
 
+  
+  const setFocus=useCallback(()=>{
+    methodsRef.current?.focus()
+  },[])
+  const dismissKeyboard = useCallback(()=>{
+    methodsRef.current?.dismiss()
+  },[])
   return (
       <View surface style={[styles.view]}>
        <View accent style={[styles.topBar]}>
             <Text style={[styles.textButton]} onPress={setFocus}>focus </Text>
-            <Text style={[styles.textButton]} onPress={Keyboard.dismiss}>dimiss keyboard</Text>
+            <Text style={[styles.textButton]} onPress={dismissKeyboard}>dimiss keyboard</Text>
              <View style={{flex : 1}}/>
              <Switch value={dark} onValueChange={toggleTheme}/>
         </View>
@@ -30,13 +36,13 @@ export default function Theme(){
           <View style={[styles.flex]}/>
           <View style={[styles.textView]}>
               <Text style={[styles.text]}>email</Text>
-              <TextInput style={[styles.textInput]} onFocus={autoFocus}
+              <ImperativeTextInput style={[styles.textInput]} onFocus={autoFocus}
               value={person.email}placeholder="enter you email"
               onChangeText={(email)=>setPerson((person)=>({...person,email}))}/>
           </View>
           <View style={[styles.textView]}>
               <Text style={[styles.text]}>name</Text>
-              <TextInput ref={textInputRef}
+              <ImperativeTextInput ref={methodsRef}
               style={[styles.textInput]} onFocus={autoFocus}
               value={person.name} placeholder="name"
               onChangeText={(name)=>setPerson((person)=>({...person,name}))}/>
